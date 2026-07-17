@@ -16,11 +16,11 @@
   </form>
 
   <div class="meta-row">
-    <span id="count-label">0 tasks</span>
+    <span id="count-label">{{ tasks.count}} tasks</span>
     <div class="filters">
-      <button data-filter="all" class="active">All</button>
-      <button data-filter="active">Active</button>
-      <button data-filter="done">Done</button>
+      <a href="{% url 'home' %}" class="active">All</a>
+      <a href="{% url 'tasks' 'true' %}">Not done</a>
+      <a href="{% url "tasks" 'true' %}">Done</a>
     </div>
   </div>
 
@@ -38,8 +38,11 @@
       <circle cx="11" cy="11" r="9.3"></circle>
       <path d="M6.5 11.5l3 3 6-6.5"></path>
     </svg> 
-      </span>
-      {{ task.text }}
+    </span>
+      {{ task.title }} &nbsp;
+      &nbsp; &nbsp;
+      <a href="{% url "task" pk=task.id %}">Edit</a> 
+      <a href="{% url "delete" pk=task.id %}"class='remove'aria-label="Delete task">Delete</a>
     </li>
     {%endfor%}
   </ul>
