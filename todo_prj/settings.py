@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['Vinnie-Todo-App']
+ALLOWED_HOSTS = ['vina-todo-app.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -132,7 +132,7 @@ MEDIA_URL = 'media/'
 # Optional tip: It's usually best to make MEDIA_ROOT an absolute path too
 MEDIA_ROOT = BASE_DIR / 'media'
 
-CSFR_TRUSTED_ORIGINS = [
-    "",
+CSRF_TRUSTED_ORIGINS = [
+    'https://vina-todo-app.onrender.com',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
