@@ -128,3 +128,8 @@ STATICFILES_STORAGE = ('whitenoise.CompressedManifestStaticFilesStorage')
 MEDIA_URL = 'media/'
 # Optional tip: It's usually best to make MEDIA_ROOT an absolute path too
 MEDIA_ROOT = BASE_DIR / 'media'
+
+CSFR_TRUSTED_ORIGINS = [
+    "",
+]
+CORS_ALLOW_ALL_ORIGINS = True
