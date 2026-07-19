@@ -7,13 +7,13 @@ from . models import Task
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from django.utils import timezone
 
 # Create your views here.
 def register_view(request):
     if request.user.is_authenticated:
-        messages.warning(request, 'Already Signed In!!')
-        return redirect
+         messages.warning(request, 'Already Signed In!!')
+         return redirect('home')
     
     form = RegisterForm()
     errors = None
@@ -31,13 +31,11 @@ def register_view(request):
                 messages.success(request, 'Account Created and Login Successfull!!')
                 return redirect('home')
             else:
-                errors = form.errors.as_data()
-                messages.error(request, errors)
+                messages.error(request, 'Invalid Username or Password..')
                 return redirect('login')
         else:
             errors = form.errors.as_data()
             messages.error(request, errors)
-
             return redirect('register')
 
     context = {
@@ -53,7 +51,6 @@ def home(request):
     h = int(date.strftime('%H'))
 
     msg = 'Good '
-
     if h < 12:
         msg += 'Morning'
     elif h < 16:
@@ -66,11 +63,15 @@ def home(request):
     greeting = f'{msg}! {request.user.username}'
 
     task = Task.objects.filter(user=request.user).order_by('-created_at')
-    #Read everything
+
+    total = task.count()
+    done_count = task.filter(done=True).count()
+    percent_done = int((done_count / total) * 100) if total else 0
 
     context = {
-        'greeting':greeting,
-        'tasks' : task
+        'greeting': greeting,
+        'tasks': task,
+        'percent_done': percent_done,
     }
 
     return render(request, 'home.html', context)
@@ -102,34 +103,26 @@ def logout_view(request):
     return redirect('login')
 
 
+from django.utils import timezone
+
 @login_required(login_url='login')
 def add_task(request):
-    forms = TaskForm()
+    forms = TaskForm(initial={'due_time': timezone.now().strftime('%Y-%m-%dT%H:%M')})
     if request.method == 'POST':
-       forms = TaskForm(request.POST)
-
-       #===========================#
-       # check for form validation#
-       # =========================#
-       if forms.is_valid():
-            instance =  forms.save(commit=False)
+        forms = TaskForm(request.POST)
+        if forms.is_valid():
+            instance = forms.save(commit=False)
             instance.user = request.user
             instance.save()
             messages.success(request, 'Task Added Successfully')
             return redirect('home')
-       
-       else:
+        else:
             errors = forms.errors.as_data()
             messages.error(request, errors)
             return redirect('add_task')
-    
-    context = {
-        'forms':forms
-    }
 
+    context = {'forms': forms}
     return render(request, 'add_task.html', context)
-
-
 
 @login_required(login_url='login')
 def filter_tasks(request, foo):
@@ -175,7 +168,7 @@ def update_task(request, pk):
 
 @login_required(login_url='login')
 def delete_task(request, pk):
-    task = get_object_or_404(Task, id=pk)
+    task = get_object_or_404(Task, id=pk, user=request.user)
     task.delete()
     messages.success(request, 'Task Deleted')
     return redirect('home')

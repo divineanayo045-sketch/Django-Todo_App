@@ -1,57 +1,78 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="app">
-  <header>
+<div class="board-wrap">
+  <header class="board-header">
     <div class="eyebrow">Today</div>
-    <p>
-      {{greeting}}
-    </p>
+    <p>{{ greeting }}</p>
     <h1>What needs <em>doing</em>?</h1>
-    <p class="sub">Add a task, check it off when it's done. Nothing here leaves this page.</p>
+    <p class="sub">Add a task, drag your focus between columns as you work through it.</p>
+    <div class="progress-row">
+  <div class="progress-track">
+    <div class="progress-fill" style="width: {{ percent_done }}%;"></div>
+  </div>
+  <span class="progress-label">{{ percent_done }}% complete</span>
+</div>
+
+    <form id="task-form" method="GET" action="{% url 'add_task' %}">
+      <input id="task-input" type="text" placeholder="e.g. Reply to client email" autocomplete="off" maxlength="140" disabled>
+      <button type="submit" class="add">Add task</button>
+    </form>
   </header>
 
-  <form id="task-form">
-    <input id="task-input" type="text" placeholder="e.g. Reply to client email" autocomplete="off" maxlength="140">
-    <button type="submit" class="add">Add task</button>
-  </form>
-
-  <div class="meta-row">
-    <span id="count-label">{{ tasks.count}} tasks</span>
-    <div class="filters">
-      <a href="{% url 'home' %}" class="active">All</a>
-      <a href="{% url 'tasks' 'true' %}">Not done</a>
-      <a href="{% url "tasks" 'true' %}">Done</a>
+  <div class="board">
+    <div class="column todo">
+      <div class="column-header">
+        <span class="column-title"><span class="column-dot"></span> To Do</span>
+        <span class="column-count">{{ tasks|length }}</span>
+      </div>
+      <ul class="card-list">
+        {% for task in tasks %}
+          {% if not task.done %}
+          <li class="item">
+            {% comment %} <span class="label">{{ task.title }}</span> {% endcomment %}
+            <span class="check" role="checkbox" aria-checked="false" tabindex="0">
+              <svg viewBox="0 0 22 22">
+                <circle cx="11" cy="11" r="9.3"></circle>
+                <path d="M6.5 11.5l3 3 6-6.5"></path>
+              </svg>
+            </span>
+            <span class="label">{{ task.title }}</span>
+            <div class="item-actions">
+            {% comment %} <span class="due-badge">{{ task.due_time|date:"M d, g:i A" }}</span> {% endcomment %}
+              <a href="{% url 'task' pk=task.id %}">Edit</a>
+              <a href="{% url 'delete' pk=task.id %}" class="remove" aria-label="Delete task">Delete</a>
+            </div>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
     </div>
-  </div>
 
-  <ul id="list">
-    {% for task in tasks %}
-
-    {% if task.done %}
-    <li class="item done">
-      {% else %}
-    <li class="item">
-      {% endif %} 
-
-      <span class="check" role="checkbox" aria-checked={{task.done}} tabindex="0">
-        <svg viewBox="0 0 22 22">
-      <circle cx="11" cy="11" r="9.3"></circle>
-      <path d="M6.5 11.5l3 3 6-6.5"></path>
-    </svg> 
-    </span>
-      {{ task.title }} &nbsp;
-      &nbsp; &nbsp;
-      <a href="{% url "task" pk=task.id %}">Edit</a> 
-      <a href="{% url "delete" pk=task.id %}"class='remove'aria-label="Delete task">Delete</a>
-    </li>
-    {%endfor%}
-  </ul>
-  <div class="empty" id="empty-state" style="display:none;">
-    <div class="glyph">nothing yet</div>
-    <p>Type something above and press Add task.</p>
+    <div class="column done">
+      <div class="column-header">
+        <span class="column-title"><span class="column-dot"></span> Done</span>
+        <span class="column-count">{{ tasks|length }}</span>
+      </div>
+      <ul class="card-list">
+        {% for task in tasks %}
+          {% if task.done %}
+          <li class="item done">
+            <span class="check" role="checkbox" aria-checked="true" tabindex="0">
+              <svg viewBox="0 0 22 22">
+                <circle cx="11" cy="11" r="9.3"></circle>
+                <path d="M6.5 11.5l3 3 6-6.5"></path>
+              </svg>
+            </span>
+            <span class="label">{{ task.title }}</span>
+            <div class="item-actions">
+              <a href="{% url 'task' pk=task.id %}">Edit</a>
+              <a href="{% url 'delete' pk=task.id %}" class="remove" aria-label="Delete task">Delete</a>
+            </div>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
   </div>
 </div>
 {% endblock content %}
-
-
-

@@ -4,11 +4,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Todo — start your list</title>
+<title>Todo — Task Manager</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static "CSS/style.css" %}">
-
+<link rel="stylesheet" href="{% static 'CSS/style.css' %}">
 </head>
 <body>
     <nav>
@@ -16,23 +15,25 @@
         <ul>
             <li><a href="{% url "home" %}">Home</a></li>
             {% if request.user.is_authenticated %}
-            <li><a href="{% url "logout" %}">Logout</a></li>
+            <li><a href="{% url 'logout' %}" class="nav-user"><span class="avatar">{{ user.username|slice:":1"|upper }}</span>Logout</a></li>
             {% else %}
             <li><a href="{% url "login" %}">Login</a></li>
+            <li><a href="{% url "register" %}">Register</a></li>
             {% endif %}
             <li><a href="{% url "add_task" %}">Add Task</a></li>
         </ul>
     </nav>
+
     {% if messages %}
-    {% for messages in messages %}
-        <div class='alert alert-{{message.tags}} alert-dismissable fade show' role='alert'>
-            {{ message }}
-            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      {% for message in messages %}
+        <div class="flash {% if message.tags == 'error' %}flash-error{% else %}flash-success{% endif %}">
+          {{ message }}
         </div>
-    {% endfor %}
+      {% endfor %}
     {% endif %}
+
     <div class="container">
-        {% block content  %}
+        {% block content %}
         {% endblock content %}
     </div>
 

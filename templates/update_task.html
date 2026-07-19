@@ -1,9 +1,23 @@
 {% extends "base.html" %}
-
 {% block content %}
-<form method="POST"> 
-    {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">Update</button>
-</form>
+<div class="task-form-wrap">
+  <div class="task-form-card">
+    <span class="auth-eyebrow">Edit Task</span>
+    <h1>Update <em>"{{ task.title }}"</em></h1>
+    <p class="auth-sub">Make your changes below.</p>
+
+    <form method="POST">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <button type="submit" class="auth-submit">Save changes</button>
+    </form>
+  </div>
+</div>
 {% endblock content %}
