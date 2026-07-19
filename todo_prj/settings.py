@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['Vinnie-Todo-App']
 
 
 # Application definition
@@ -76,11 +76,14 @@ WSGI_APPLICATION = 'todo_prj.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 import dj_database_url
-DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL')),
-    
-    }
 
+# Keep your local SQLite for development, but use Postgres on Render
+DATABASES = {
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
+}
 
 
 # Password validation
